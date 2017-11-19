@@ -1,0 +1,31 @@
+import RPi.GPIO as GPIO
+import time
+
+LedPin = 11
+
+
+def setup():
+    GPIO.setmode(GPIO.BOARD)  #Numbers GPIOS by Physical Location
+    GPIO.setup(LedPin, GPIO.OUT) #Set LedPin's Mode to Output
+    GPIO.output(LedPin, GPIO.HIGH) #Turns  On LedPin
+
+def blink():
+    while True:
+        GPIO.output(LedPin, GPIO.HIGH)
+        time.sleep(1)
+        GPIO.output(LedPin, GPIO.LOW)
+        time.sleep(1)
+
+def destroy():
+    GPIO.output(LedPin, GPIO.LOW)
+    GPIO.cleanup()   # release resources
+
+
+
+if __name__ == '__main__':  # Main Program Starts Here
+    setup()
+    try:
+        blink()
+    except KeyboardInterrupt:   # When 'Ctrl + C is pressed, the function destroy will be called
+        destroy()
+    
