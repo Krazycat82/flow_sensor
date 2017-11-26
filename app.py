@@ -7,24 +7,13 @@ get example:
 curl http://localhost:5000/flow_sensor/api/v1.0/amounts
 '''
 from flask import Flask,jsonify, request
+from json2html import *
 
 app = Flask(__name__) # Intializes Library
 
 #TODO remove fake data Empty array
-amounts_array = [
-    {
-        'id': 1,
-        'timestamp': '2017/11/04 22:00:00',
-        'amount': 123,
-        'duration_in_seconds': 1245
-    },
-    {
-        'id': 2,
-        'timestamp': '2017/11/05 22:08:12',
-        'amount': 122,
-        'duration_in_seconds': 1243
-    }
-]
+
+amounts_array = []
     
 # getting data
 @app.route('/flow_sensor/api/v1.0/amounts', methods=['GET']) 
@@ -36,10 +25,13 @@ def get_amounts():
 def post_amounts():
     if not request.json or not 'amount' in request.json:
         abort(400)
-
+    NumberOfAmounts = len(amounts_array)
+    print(NumberOfAmounts)
+    ID = NumberOfAmounts + 1 
+    
     # creating a json object
     amount = {
-        'id': amounts[-1]['id'] + 1,  # amounts[-1] last element
+        'id': ID,  
         'timestamp': request.json['timestamp'],
         'amount': request.json['amount'],
         'duration_in_seconds': request.json['duration_in_seconds']
@@ -49,6 +41,9 @@ def post_amounts():
 
 @app.route('/')
 def index():
+    infoFromJson = get_amounts()
+    
+    print json2html.convert(json = infoFromJson)
     return "POTATO POTATO"
 
 if __name__ == '__main__':

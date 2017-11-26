@@ -5,6 +5,7 @@
 import RPi.GPIO as GPIO
 import time
 import math
+import requests
 
 FlowPin = 8  # flow sensor pin
 LastState = 0 #last state
@@ -15,42 +16,50 @@ def setup():
     
 def read():
     LastState = GPIO.input(FlowPin)
-    count = 0
-    spins = 0
-    Lastspintime = 0
-    ShowerTime = 0
-    ShowerInactivityTime = 10
-    ShowerStart = 0
+    count = 0 #times it has read the pin
+    spins = 0 #total spins
+    Lastspintime = 0  #time it last spun
+    ShowerTime = 0 #how long the shower is in seconds
+    ShowerInactivityTime = 10 #seconds
+    ShowerStartTime = 0
     ShowerOn = 0
     SpinsInShower = 0
+    StartTime = time.time()
     while True:
         CurrentState = GPIO.input(FlowPin)
        
         if (CurrentState == LastState):
-           # print('No Change')
            pass
         else:
             if (CurrentState == 1):
-                #print('One Spin')
                 spins = spins + 1
                 SpinsInShower = SpinsInShower + 1
                 if(ShowerOn == 0):
-                    ShowerStart = time.time()
+                    ShowerStartTime = time.time()
                     SpinsInShower = 0
                 ShowerOn = 1
                 Lastspintime = time.time()
-            else:
-               # print('No Spin')
-               pass
+    
             LastState = CurrentState
 
         if(time.time()-Lastspintime >= ShowerInactivityTime and ShowerOn == 1):
             ShowerOn = 0
-            ShowerTime = time.time() - ShowerInactivityTime - ShowerStart
+            ShowerTime = time.time() - ShowerInactivityTime - ShowerStartTime
+            print(SpinsInShower, SpinsInShower * 2.25 * 0.000594389, time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(ShowerStartTime)), int(math.ceil(ShowerTime)))
+            post_amount(SpinsInShower * 2.25 * 0.000594389, time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(ShowerStartTime)), int(math.ceil(ShowerTime)))
 
-        count = count + 1
-        if count % 10000 == 0:
-            print(count // 10000, spins, ShowerOn, SpinsInShower, SpinsInShower * 2.25 * 0.000594389, time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(ShowerStart)), int(math.ceil(ShowerTime)))
+        count = count + 1   
+        if(time.time() >= StartTime + 10):
+            print(count, spins)
+            StartTime = time.time()
+            count = 0
+
+def post_amount(amt, timestamp, duration_in_seconds):
+    amount = {"amount":amt,"timestamp":timestamp, "duration_in_seconds":duration_in_seconds}
+    resp = requests.post("http://localhost:5000/flow_sensor/api/v1.0/amounts", json=amount)
+    if resp.status_code != 201:
+        raise ApiError('POST /amounts/ {}'.format(resp.status_code))
+    print('Created amounts. ID: {}'.format(resp.json())) 
         
 def destroy():
     # GPIO.output(LedPin, GPIO.LOW)
