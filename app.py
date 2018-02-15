@@ -1,5 +1,5 @@
 '''
-
+https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amounts
 TODO add discription of program
 post example:
 curl -i -H "Content-Type: application/json" -X POST -d  '{"amount":201,"timestamp":"2017/11/06 22:00:00", "duration_in_seconds":1245}' http://localhost:5000/flow_sensor/api/v1.0/amounts
