@@ -43,7 +43,7 @@ def post_amounts():
 def index():
     infoFromJson = get_amounts()
     
-    print json2html.convert(json = infoFromJson)
+#    print json2html.convert(json = infoFromJson)
     return "POTATO POTATO"
 
 if __name__ == '__main__':
