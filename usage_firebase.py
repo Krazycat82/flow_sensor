@@ -1,16 +1,3 @@
-'''
-https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amounts
-TODO add discription of program
-post example:
-curl -i -H "Content-Type: application/json" -X POST -d  '{"amount":0.1201,"timestamp":"2018/02/19 22:00:00", "duration_in_seconds":10.1}' http://localhost:5000/flow_sensor/api/v1.0/amounts
-curl -i -H "Content-Type: application/json" -X POST -d  '{"amount":0.1201,"timestamp":"2018/02/19 22:00:00", "duration_in_seconds":10.1}' https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amounts
-get example:
-curl http://localhost:5000/flow_sensor/api/v1.0/amounts
-curl https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amounts
-
-'''
-from flask import Flask,jsonify, request
-from json2html import *
 import pyrebase
 import datetime, time
 import json
@@ -107,7 +94,6 @@ def get_amounts(amounts_type):
         python_obj = json.loads(json_data)
         count = count + 1
         print str(count) + " - " + json_data
-    return json_data
 
 def process(amount, duration_in_seconds, timestamp, user):
     save_raw_amounts(amount, duration_in_seconds, timestamp, user)
@@ -134,7 +120,7 @@ def simulate_water_usage(days_to_simulate):
 
         # 2.5 gallons a minute
         amount = 2.5 * duration_in_seconds
-        process(amount, duration_in_seconds, now, "Coco")
+        # process(amount, duration_in_seconds, now, "Coco")
         # time.sleep( 5 )
 
 def dump_water_usage():
@@ -145,43 +131,8 @@ def dump_water_usage():
     get_amounts("monthly_amounts")
     get_amounts("yearly_amounts")
 
-app = Flask(__name__) # Intializes Library
-
-#TODO remove fake data Empty array
-
-# amounts_array = []
-
-# getting data
-@app.route('/flow_sensor/api/v1.0/amounts', methods=['GET'])
-def get_amounts():
-    amounts = get_amounts("raw_amounts")
-    print(amounts)
-    return jsonify({'amounts': amounts})
-
-# saving data
-@app.route('/flow_sensor/api/v1.0/amounts', methods=['POST'])
-def post_amounts():
-    if not request.json or not 'amount' in request.json:
-        abort(400)
-    # creating a json object
-    amount = request.json['amount']
-    duration_in_seconds = request.json['duration_in_seconds']
-    timestamp = request.json['timestamp']
-    amount = {
-        # 'id': ,
-        'timestamp': timestamp,
-        'amount': amount,
-        'duration_in_seconds': duration_in_seconds
-    }
-    process(amount, duration_in_seconds, timestamp, "Coco")
-
-    print(amount)
-    return str(amount), 201
-
-@app.route('/')
-def index():
-    infoFromJson = get_amounts()
-    return "POTATO POTATO"
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+###########################################################################################
+# simulate today's
+simulate_water_usage(1)
+# simulate 16 days
+simulate_water_usage(15)

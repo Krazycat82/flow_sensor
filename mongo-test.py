@@ -4,12 +4,12 @@ client = MongoClient('mongodb://thedots:vAwru&ax8zaB@ds241668.mlab.com:41668/dri
 
 db=client.dripdrop
 
-amount = {
-    'timestamp': "2018/02/19 22:02:10",
-    'amount': 0.1465,
-    'duration_in_seconds': 9.3
-}
-result=db.amounts.insert_one(amount)
+# amount = {
+#     'timestamp': "2018/02/19 22:00:10",
+#     'amount': 0.1465,
+#     'duration_in_seconds': 9.3
+# }
+# result=db.amounts.insert_one(amount)
 
 # read all back
 amounts = []
