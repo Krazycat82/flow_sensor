@@ -98,7 +98,7 @@ def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amount, duratio
     water_usage = WaterUsage(new_amount, new_duration, timestamp, user)
     db.child("flow_sensor").child(aggregate_type).child(aggregate_key).set(water_usage.__dict__)
 
-def get_amounts(amounts_type):
+def get_usage_amounts(amounts_type):
     print "+++++++++++++++++++++++ " + amounts_type + " ++++++++++++++++++++++++++++++++++"
     amounts = db.child("flow_sensor").child(amounts_type).get()
     count = 0
@@ -107,6 +107,7 @@ def get_amounts(amounts_type):
         python_obj = json.loads(json_data)
         count = count + 1
         print str(count) + " - " + json_data
+    # TODO return all the amounts not just the last one
     return json_data
 
 def process(amount, duration_in_seconds, timestamp, user):
@@ -138,12 +139,12 @@ def simulate_water_usage(days_to_simulate):
         # time.sleep( 5 )
 
 def dump_water_usage():
-    get_amounts("raw_amounts")
-    get_amounts("today")
-    get_amounts("daily_amounts")
-    get_amounts("weekly_amounts")
-    get_amounts("monthly_amounts")
-    get_amounts("yearly_amounts")
+    get_usage_amounts("raw_amounts")
+    get_usage_amounts("today")
+    get_usage_amounts("daily_amounts")
+    get_usage_amounts("weekly_amounts")
+    get_usage_amounts("monthly_amounts")
+    get_usage_amounts("yearly_amounts")
 
 app = Flask(__name__) # Intializes Library
 
@@ -154,9 +155,10 @@ app = Flask(__name__) # Intializes Library
 # getting data
 @app.route('/flow_sensor/api/v1.0/amounts', methods=['GET'])
 def get_amounts():
-    amounts = get_amounts("raw_amounts")
-    print(amounts)
-    return jsonify({'amounts': amounts})
+    amounts = get_usage_amounts("today")
+    # amounts = get_usage_amounts("raw_amounts")
+    print "get_amounts: " + amounts
+    return "{\"today\":" + amounts + " }"
 
 # saving data
 @app.route('/flow_sensor/api/v1.0/amounts', methods=['POST'])
