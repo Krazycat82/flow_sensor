@@ -19,20 +19,20 @@ import random
 # https://thedots-19a0e.firebaseio.com/flow_sensor
 
 # my account
-config = {
-  "apiKey": "AIzaSyBREEXP3HTMN5PLfVlbJ7qIqakbzSql3KE",
-  "authDomain": "thedots-19a0e.firebaseapp.com",
-  "databaseURL": "https://thedots-19a0e.firebaseio.com",
-  "storageBucket": "thedots-19a0e.appspot.com"
-}
+# config = {
+#   "apiKey": "AIzaSyBREEXP3HTMN5PLfVlbJ7qIqakbzSql3KE",
+#   "authDomain": "thedots-19a0e.firebaseapp.com",
+#   "databaseURL": "https://thedots-19a0e.firebaseio.com",
+#   "storageBucket": "thedots-19a0e.appspot.com"
+# }
 
 # Coach account
-# config = {
-#   "apiKey": "AIzaSyCz7orSLS09q3kcndmZ3iegqn3oXIgwRe0",
-#   "authDomain": "the-dots-drip-drop.firebaseapp.com",
-#   "databaseURL": "https://the-dots-drip-drop.firebaseio.com",
-#   "storageBucket": "the-dots-drip-drop.appspot.com"
-# }
+config = {
+  "apiKey": "AIzaSyCz7orSLS09q3kcndmZ3iegqn3oXIgwRe0",
+  "authDomain": "the-dots-drip-drop.firebaseapp.com",
+  "databaseURL": "https://the-dots-drip-drop.firebaseio.com",
+  "storageBucket": "the-dots-drip-drop.appspot.com"
+}
 
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()

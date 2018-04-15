@@ -4,8 +4,8 @@ import json
 import random
 import requests
 
-# dripdropURL = "https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amounts"
-dripdropURL = "http://0.0.0.0:5000/flow_sensor/api/v1.0/amounts"
+dripdropURL = "https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amounts"
+# dripdropURL = "http://0.0.0.0:5000/flow_sensor/api/v1.0/amounts"
 
 
 # https://thedots-19a0e.firebaseio.com/flow_sensor
@@ -165,8 +165,8 @@ def dump_water_usage():
 
 ###########################################################################################
 # simulate today's
-simulate_water_usage_from_device(1)
+# simulate_water_usage_from_device(1)
 # simulate 16 days
 # simulate_water_usage(15)
-# simulate_water_usage_from_device(15)
+simulate_water_usage_from_device(15)
 dump_water_usage()
