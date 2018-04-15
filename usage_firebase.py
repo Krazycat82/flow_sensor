@@ -2,6 +2,11 @@ import pyrebase
 import datetime, time
 import json
 import random
+import requests
+
+# dripdropURL = "https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amounts"
+dripdropURL = "http://0.0.0.0:5000/flow_sensor/api/v1.0/amounts"
+
 
 # https://thedots-19a0e.firebaseio.com/flow_sensor
 
@@ -12,6 +17,7 @@ config = {
   "databaseURL": "https://thedots-19a0e.firebaseio.com",
   "storageBucket": "thedots-19a0e.appspot.com"
 }
+
 
 # Coach account
 # config = {
@@ -120,7 +126,33 @@ def simulate_water_usage(days_to_simulate):
 
         # 2.5 gallons a minute
         amount = 2.5 * duration_in_seconds
-        # process(amount, duration_in_seconds, now, "Coco")
+        process(amount, duration_in_seconds, now, "Coco")
+        # time.sleep( 5 )
+
+def post_amount(amt, duration_in_seconds, timestamp):
+    amount = {"amount":amt,"timestamp":timestamp, "duration_in_seconds":duration_in_seconds}
+    resp = requests.post(dripdropURL, json=amount)
+    if resp.status_code != 201:
+        raise ApiError('POST /amounts/ {}'.format(resp.status_code))
+#    print('Created amounts. ID: {}'.format(resp.json()))
+
+def simulate_water_usage_from_device(days_to_simulate):
+    if days_to_simulate > 1:
+        days_to_simulate_str = "last " + str(days_to_simulate) + " days."
+    else:
+        days_to_simulate_str = "today."
+    print "Simulate water usage for " + days_to_simulate_str
+    start_date = datetime.datetime.now() - datetime.timedelta(days=(days_to_simulate-1))
+    count = 0
+    while (count < days_to_simulate):
+        now = start_date + datetime.timedelta(days=count)
+        count = count + 1
+        duration_in_seconds = random.uniform(15, 20) * 60
+        print str(count) + " - " + str(now)
+
+        # 2.5 gallons a minute
+        amount = 2.5 * duration_in_seconds
+        post_amount(amount, duration_in_seconds, now.strftime("%D %T"))
         # time.sleep( 5 )
 
 def dump_water_usage():
@@ -133,6 +165,8 @@ def dump_water_usage():
 
 ###########################################################################################
 # simulate today's
-simulate_water_usage(1)
+simulate_water_usage_from_device(1)
 # simulate 16 days
-simulate_water_usage(15)
+# simulate_water_usage(15)
+# simulate_water_usage_from_device(15)
+dump_water_usage()
