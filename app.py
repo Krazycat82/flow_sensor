@@ -58,7 +58,7 @@ def update_today_amount(amount, duration_in_seconds, timestamp, user):
     # check if need to reset/remove today's amount
     amounts = db.child("flow_sensor").child("today").order_by_child("date").equal_to(key).get()
     if len(amounts.each()) <= 0:
-        print "Start new day, delete yesterday's data"
+        print "Start new day, delete yesterday data"
         db.child("flow_sensor").child("today").remove()
     aggregate_usage("today", "date", key, amount, duration_in_seconds, timestamp, user)
 
