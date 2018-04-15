@@ -54,7 +54,7 @@ def save_raw_amounts(amount, duration_in_seconds, timestamp, user):
     db.child("flow_sensor").child("raw_amounts").push(water_usage.__dict__)
 
 def update_today_amount(amount, duration_in_seconds, timestamp, user):
-    key = now.strftime("%Y%m%d")
+    key = timestamp.strftime("%Y%m%d")
     # check if need to reset/remove today's amount
     amounts = db.child("flow_sensor").child("today").order_by_child("date").equal_to(key).get()
     if len(amounts.each()) <= 0:
@@ -112,7 +112,7 @@ def get_usage_amounts(amounts_type):
 
 def process(amount, duration_in_seconds, timestamp, user):
     save_raw_amounts(amount, duration_in_seconds, timestamp, user)
-    update_today_amount(amount, duration_in_seconds, timestamp, user)
+    # update_today_amount(amount, duration_in_seconds, timestamp, user)
     update_daily_amount(amount, duration_in_seconds, timestamp, user)
     update_weekly_amount(amount, duration_in_seconds, timestamp, user)
     update_monthly_amount(amount, duration_in_seconds, timestamp, user)
@@ -168,10 +168,11 @@ def post_amounts():
     # creating a json object
     amount = request.json['amount']
     duration_in_seconds = request.json['duration_in_seconds']
-    timestamp = request.json['timestamp']
+    # timestamp = request.json['timestamp']
+    timestamp = datetime.datetime.now()
     amount = {
         # 'id': ,
-        'timestamp': timestamp,
+        'timestamp': timestamp.strftime("%D %T"),
         'amount': amount,
         'duration_in_seconds': duration_in_seconds
     }
