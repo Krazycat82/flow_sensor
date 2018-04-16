@@ -109,7 +109,7 @@ def get_usage_amounts(amounts_type):
     print "+++++++++++++++++++++++ " + amounts_type + " ++++++++++++++++++++++++++++++++++"
     amounts = db.child("flow_sensor").child(amounts_type).get()
     count = 0
-    if len(amounts.each()) <= 0:
+    if len(amounts.each()) > 0:
         for amount in amounts.each():
             json_data = json.dumps(amount.val())
             python_obj = json.loads(json_data)
