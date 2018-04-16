@@ -177,7 +177,7 @@ def post_amounts():
     # creating a json object
     amount = request.json['amount']
     duration_in_seconds = request.json['duration_in_seconds']
-    timestamp = datetime.strptime(request.json['timestamp'], '%D %T')
+    timestamp = datetime.datetime.strptime(request.json['timestamp'], '%D %T')
     # timestamp = request.json['timestamp']
     # timestamp = datetime.datetime.now()
     water_usage = process(amount, duration_in_seconds, timestamp, "Coco")
