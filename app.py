@@ -19,20 +19,20 @@ import random
 # https://thedots-19a0e.firebaseio.com/flow_sensor
 
 # my account
-# config = {
-#   "apiKey": "AIzaSyBREEXP3HTMN5PLfVlbJ7qIqakbzSql3KE",
-#   "authDomain": "thedots-19a0e.firebaseapp.com",
-#   "databaseURL": "https://thedots-19a0e.firebaseio.com",
-#   "storageBucket": "thedots-19a0e.appspot.com"
-# }
+config = {
+  "apiKey": "AIzaSyBREEXP3HTMN5PLfVlbJ7qIqakbzSql3KE",
+  "authDomain": "thedots-19a0e.firebaseapp.com",
+  "databaseURL": "https://thedots-19a0e.firebaseio.com",
+  "storageBucket": "thedots-19a0e.appspot.com"
+}
 
 # Coach account
-config = {
-  "apiKey": "AIzaSyCz7orSLS09q3kcndmZ3iegqn3oXIgwRe0",
-  "authDomain": "the-dots-drip-drop.firebaseapp.com",
-  "databaseURL": "https://the-dots-drip-drop.firebaseio.com",
-  "storageBucket": "the-dots-drip-drop.appspot.com"
-}
+# config = {
+#   "apiKey": "AIzaSyCz7orSLS09q3kcndmZ3iegqn3oXIgwRe0",
+#   "authDomain": "the-dots-drip-drop.firebaseapp.com",
+#   "databaseURL": "https://the-dots-drip-drop.firebaseio.com",
+#   "storageBucket": "the-dots-drip-drop.appspot.com"
+# }
 
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
@@ -109,12 +109,13 @@ def get_usage_amounts(amounts_type):
     print "+++++++++++++++++++++++ " + amounts_type + " ++++++++++++++++++++++++++++++++++"
     amounts = db.child("flow_sensor").child(amounts_type).get()
     count = 0
-    for amount in amounts.each():
-        json_data = json.dumps(amount.val())
-        python_obj = json.loads(json_data)
-        count = count + 1
-        print str(count) + " - " + json_data
-    # TODO return all the amounts not just the last one
+    if len(amounts.each()) <= 0:
+        for amount in amounts.each():
+            json_data = json.dumps(amount.val())
+            python_obj = json.loads(json_data)
+            count = count + 1
+            print str(count) + " - " + json_data
+        # TODO return all the amounts not just the last one
     return json_data
 
 def process(amount, duration_in_seconds, timestamp, user):

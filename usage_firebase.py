@@ -11,21 +11,21 @@ dripdropURL = "https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amou
 # https://thedots-19a0e.firebaseio.com/flow_sensor
 
 # my account
-config = {
-  "apiKey": "AIzaSyBREEXP3HTMN5PLfVlbJ7qIqakbzSql3KE",
-  "authDomain": "thedots-19a0e.firebaseapp.com",
-  "databaseURL": "https://thedots-19a0e.firebaseio.com",
-  "storageBucket": "thedots-19a0e.appspot.com"
-}
+# config = {
+#   "apiKey": "AIzaSyBREEXP3HTMN5PLfVlbJ7qIqakbzSql3KE",
+#   "authDomain": "thedots-19a0e.firebaseapp.com",
+#   "databaseURL": "https://thedots-19a0e.firebaseio.com",
+#   "storageBucket": "thedots-19a0e.appspot.com"
+# }
 
 
 # Coach account
-# config = {
-#   "apiKey": "AIzaSyCz7orSLS09q3kcndmZ3iegqn3oXIgwRe0",
-#   "authDomain": "the-dots-drip-drop.firebaseapp.com",
-#   "databaseURL": "https://the-dots-drip-drop.firebaseio.com",
-#   "storageBucket": "the-dots-drip-drop.appspot.com"
-# }
+config = {
+  "apiKey": "AIzaSyCz7orSLS09q3kcndmZ3iegqn3oXIgwRe0",
+  "authDomain": "the-dots-drip-drop.firebaseapp.com",
+  "databaseURL": "https://the-dots-drip-drop.firebaseio.com",
+  "storageBucket": "the-dots-drip-drop.appspot.com"
+}
 
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
@@ -47,7 +47,7 @@ def save_raw_amounts(amount, duration_in_seconds, timestamp, user):
     db.child("flow_sensor").child("raw_amounts").push(water_usage.__dict__)
 
 def update_today_amount(amount, duration_in_seconds, timestamp, user):
-    key = now.strftime("%Y%m%d")
+    key = timestamp.strftime("%Y%m%d")
     # check if need to reset/remove today's amount
     amounts = db.child("flow_sensor").child("today").order_by_child("date").equal_to(key).get()
     if len(amounts.each()) <= 0:
@@ -95,11 +95,12 @@ def get_amounts(amounts_type):
     print "+++++++++++++++++++++++ " + amounts_type + " ++++++++++++++++++++++++++++++++++"
     amounts = db.child("flow_sensor").child(amounts_type).get()
     count = 0
-    for amount in amounts.each():
-        json_data = json.dumps(amount.val())
-        python_obj = json.loads(json_data)
-        count = count + 1
-        print str(count) + " - " + json_data
+    if len(amounts.each()) <= 0:
+        for amount in amounts.each():
+            json_data = json.dumps(amount.val())
+            python_obj = json.loads(json_data)
+            count = count + 1
+            print str(count) + " - " + json_data
 
 def process(amount, duration_in_seconds, timestamp, user):
     save_raw_amounts(amount, duration_in_seconds, timestamp, user)
@@ -121,11 +122,12 @@ def simulate_water_usage(days_to_simulate):
     while (count < days_to_simulate):
         now = start_date + datetime.timedelta(days=count)
         count = count + 1
-        duration_in_seconds = random.uniform(15, 20) * 60
+        duration_in_min = random.uniform(15, 20)
+        duration_in_seconds = duration_in_min * 60
         print str(count) + " - " + str(now)
 
         # 2.5 gallons a minute
-        amount = 2.5 * duration_in_seconds
+        amount = 2.5 * duration_in_min
         process(amount, duration_in_seconds, now, "Coco")
         # time.sleep( 5 )
 
@@ -147,11 +149,12 @@ def simulate_water_usage_from_device(days_to_simulate):
     while (count < days_to_simulate):
         now = start_date + datetime.timedelta(days=count)
         count = count + 1
-        duration_in_seconds = random.uniform(15, 20) * 60
+        duration_in_min = random.uniform(15, 20)
+        duration_in_seconds = duration_in_min * 60
         print str(count) + " - " + str(now)
 
         # 2.5 gallons a minute
-        amount = 2.5 * duration_in_seconds
+        amount = 2.5 * duration_in_min
         post_amount(amount, duration_in_seconds, now.strftime("%D %T"))
         # time.sleep( 5 )
 
@@ -167,6 +170,6 @@ def dump_water_usage():
 # simulate today's
 # simulate_water_usage_from_device(1)
 # simulate 16 days
-# simulate_water_usage(15)
-simulate_water_usage_from_device(15)
+simulate_water_usage(15)
+# simulate_water_usage_from_device(15)
 dump_water_usage()
