@@ -94,6 +94,8 @@ def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amt, duration_i
     amounts = db.child("flow_sensor").child(aggregate_type).order_by_child(aggregate_by).equal_to(aggregate_key).get()
     new_amount = amt
     new_duration = duration_in_seconds
+    prev_amount = 0
+    prev_duration = 0
     # only loops thru if daily amounts isn't empty
     if len(amounts.each()) > 0:
         for amount in amounts.each():
