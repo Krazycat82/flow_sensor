@@ -90,7 +90,7 @@ def update_yearly_amount(amount, duration_in_seconds, timestamp, user):
     aggregate_usage("yearly_amounts", "year", key, amount, duration_in_seconds, timestamp, user)
 
 def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amt, duration_in_seconds, timestamp, user):
-    print "++++ aggregate_usage: aggregate_type" + aggregate_type + " aggregate_by=" + aggregate_by + " aggregate_key=" + aggregate_key + " amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
+    print "++++ aggregate_usage: aggregate_type" + aggregate_type + " aggregate_by=" + aggregate_by + " aggregate_key=" + aggregate_key + " amount=" + str(amt) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
     amounts = db.child("flow_sensor").child(aggregate_type).order_by_child(aggregate_by).equal_to(aggregate_key).get()
     new_amount = amt
     new_duration = duration_in_seconds
