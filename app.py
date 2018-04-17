@@ -107,6 +107,7 @@ def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amount, duratio
             print "new_amount = " + str(new_amount)
             print "new_duration = " + str(new_duration)
     water_usage = WaterUsage(new_amount, new_duration, timestamp, user)
+    print "*** prev_amount=" + str(prev_amount) + " prev_duration= " + str(prev_duration) + "*** amount=" + str(amount) + " duration= " + str(duration)
     print "*** New WaterUsage: " + json.dumps(water_usage.__dict__)
     db.child("flow_sensor").child(aggregate_type).child(aggregate_key).set(water_usage.__dict__)
 
