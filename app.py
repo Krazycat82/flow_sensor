@@ -89,10 +89,10 @@ def update_yearly_amount(amount, duration_in_seconds, timestamp, user):
     key = timestamp.strftime("%Y")
     aggregate_usage("yearly_amounts", "year", key, amount, duration_in_seconds, timestamp, user)
 
-def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amount, duration_in_seconds, timestamp, user):
+def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amt, duration_in_seconds, timestamp, user):
     print "++++ aggregate_usage: aggregate_type" + aggregate_type + " aggregate_by=" + aggregate_by + " aggregate_key=" + aggregate_key + " amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
     amounts = db.child("flow_sensor").child(aggregate_type).order_by_child(aggregate_by).equal_to(aggregate_key).get()
-    new_amount = amount
+    new_amount = amt
     new_duration = duration_in_seconds
     # only loops thru if daily amounts isn't empty
     if len(amounts.each()) > 0:
@@ -107,7 +107,7 @@ def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amount, duratio
             print "new_amount = " + str(new_amount)
             print "new_duration = " + str(new_duration)
     water_usage = WaterUsage(new_amount, new_duration, timestamp, user)
-    print "*** prev_amount=" + str(prev_amount) + " prev_duration= " + str(prev_duration) + "*** amount=" + str(amount) + " duration= " + str(duration_in_seconds)
+    print "*** prev_amount=" + str(prev_amount) + " prev_duration= " + str(prev_duration) + "*** amount=" + str(amt) + " duration= " + str(duration_in_seconds)
     print "*** New WaterUsage: " + json.dumps(water_usage.__dict__)
     db.child("flow_sensor").child(aggregate_type).child(aggregate_key).set(water_usage.__dict__)
 
