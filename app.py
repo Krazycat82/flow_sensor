@@ -34,6 +34,7 @@ config = {
 #   "storageBucket": "the-dots-drip-drop.appspot.com"
 # }
 
+print "databaseURL=" + config["databaseURL"]
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 
@@ -48,15 +49,18 @@ class WaterUsage:
         self.duration_in_seconds = duration_in_seconds
         self.user = user
 
+def time2str(t):
+    return t.strftime("%d %b %Y %H:%M:%S")
+
 #flow_sensor/raw_amounts
 def save_raw_amounts(amount, duration_in_seconds, timestamp, user):
-    print "+++++++++++++++++++++++ save_raw_amounts ++++++++++++++++++++++++++++++++++"
+    print "++++ save_raw_amounts: amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
     water_usage = WaterUsage(amount, duration_in_seconds, timestamp, user)
     db.child("flow_sensor").child("raw_amounts").push(water_usage.__dict__)
     return water_usage
 
 def update_today_amount(amount, duration_in_seconds, timestamp, user):
-    print "+++++++++++++++++++++++ update_today_amount ++++++++++++++++++++++++++++++++++"
+    print "++++ update_today_amount: amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
     key = timestamp.strftime("%Y%m%d")
     # check if need to reset/remove today's amount
     amounts = db.child("flow_sensor").child("today").order_by_child("date").equal_to(key).get()
@@ -66,27 +70,27 @@ def update_today_amount(amount, duration_in_seconds, timestamp, user):
     aggregate_usage("today", "date", key, amount, duration_in_seconds, timestamp, user)
 
 def update_daily_amount(amount, duration_in_seconds, timestamp, user):
-    print "+++++++++++++++++++++++ update_daily_amount ++++++++++++++++++++++++++++++++++"
+    print "++++ update_daily_amount: amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
     key = timestamp.strftime("%Y%m%d")
     aggregate_usage("daily_amounts", "date", key, amount, duration_in_seconds, timestamp, user)
 
 def update_weekly_amount(amount, duration_in_seconds, timestamp, user):
-    print "+++++++++++++++++++++++ update_weekly_amount ++++++++++++++++++++++++++++++++++"
+    print "++++ update_weekly_amount: amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
     key = timestamp.strftime("%Y%V")
     aggregate_usage("weekly_amounts", "week", key, amount, duration_in_seconds, timestamp, user)
 
 def update_monthly_amount(amount, duration_in_seconds, timestamp, user):
-    print "+++++++++++++++++++++++ update_monthly_amount ++++++++++++++++++++++++++++++++++"
+    print "++++ update_monthly_amount: amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
     key = timestamp.strftime("%Y%m")
     aggregate_usage("monthly_amounts", "month", key, amount, duration_in_seconds, timestamp, user)
 
 def update_yearly_amount(amount, duration_in_seconds, timestamp, user):
-    print "+++++++++++++++++++++++ update_yearly_amount ++++++++++++++++++++++++++++++++++"
+    print "++++ update_yearly_amount: amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
     key = timestamp.strftime("%Y")
     aggregate_usage("yearly_amounts", "year", key, amount, duration_in_seconds, timestamp, user)
 
 def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amount, duration_in_seconds, timestamp, user):
-    print "aggregate_key = " + aggregate_key
+    print "++++ aggregate_usage: aggregate_type" + aggregate_type + " aggregate_by=" + aggregate_by + " aggregate_key=" + aggregate_key + " amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
     amounts = db.child("flow_sensor").child(aggregate_type).order_by_child(aggregate_by).equal_to(aggregate_key).get()
     new_amount = amount
     new_duration = duration_in_seconds
@@ -103,10 +107,11 @@ def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amount, duratio
             print "new_amount = " + str(new_amount)
             print "new_duration = " + str(new_duration)
     water_usage = WaterUsage(new_amount, new_duration, timestamp, user)
+    print "*** New WaterUsage: " + json.dumps(water_usage.__dict__)
     db.child("flow_sensor").child(aggregate_type).child(aggregate_key).set(water_usage.__dict__)
 
 def get_usage_amounts(amounts_type):
-    print "+++++++++++++++++++++++ " + amounts_type + " ++++++++++++++++++++++++++++++++++"
+    print "++++ " + amounts_type + ": "
     amounts = db.child("flow_sensor").child(amounts_type).get()
     count = 0
     if len(amounts.each()) > 0:
