@@ -1,0 +1,9 @@
+{
+  "name": "The Dots DripDrops API, Python",
+  "description": "The Dots DripDrops RESTful API.",
+  "keywords": [
+    "python",
+    "flask"
+  ],
+  "repository": "https://github.com/Krazycat82/flow_sensor"
+}
