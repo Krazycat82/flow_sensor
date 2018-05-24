@@ -25,6 +25,19 @@ def setup():
     GPIO.setup(FlowPin, GPIO.IN) #Set FlowPin's Mode to Input
     log("Starting....")
 #    logf.write("Starting....\n")
+ 
+def time2str(t):
+    return time.strftime("%d %b %Y %H:%M:%S", time.localtime(t))
+
+def log(message):
+    logtime = time.strftime("%D %T", time.localtime(time.time()))
+    print logtime + " " + message
+
+def setup():
+    GPIO.setmode(GPIO.BOARD)  #Numbers GPIOS by Physical Location
+    GPIO.setup(FlowPin, GPIO.IN) #Set FlowPin's Mode to Input
+    log("Starting....")
+#    logf.write("Starting....\n")
 
 def read():
     LastState = GPIO.input(FlowPin)
@@ -39,7 +52,6 @@ def read():
     StartTime = time.time()
     while True:
         CurrentState = GPIO.input(FlowPin)
-
         if (CurrentState == LastState):
             #print "CurrentState == LastState"
             pass
@@ -55,7 +67,6 @@ def read():
                 ShowerOn = 1
                 Lastspintime = time.time()
                 log("ShowerStartTime=" + time2str(ShowerStartTime) + " Lastspintime=" + time2str(Lastspintime))
-
             LastState = CurrentState
 
         if(time.time()-Lastspintime >= ShowerInactivityTime and ShowerOn == 1):

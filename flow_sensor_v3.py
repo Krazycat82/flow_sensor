@@ -9,18 +9,21 @@ import requests
 
 FlowPin = 8  # flow sensor pin
 LastState = 0 #last state
+logf = open("/home/pi/flow_sensor/flow_sensor.log", "w+", 1)
 
 def setup():
     GPIO.setmode(GPIO.BOARD)  #Numbers GPIOS by Physical Location
     GPIO.setup(FlowPin, GPIO.IN) #Set FlowPin's Mode to Input
-    
+    print("Starting....")
+    logf.write("Starting....\n")
+ 
 def read():
     LastState = GPIO.input(FlowPin)
     count = 0 #times it has read the pin
     spins = 0 #total spins
     Lastspintime = 0  #time it last spun
     ShowerTime = 0 #how long the shower is in seconds
-    ShowerInactivityTime = 10 #seconds
+    ShowerInactivityTime = 3 #seconds
     ShowerStartTime = 0
     ShowerOn = 0
     SpinsInShower = 0
@@ -46,17 +49,19 @@ def read():
             ShowerOn = 0
             ShowerTime = time.time() - ShowerInactivityTime - ShowerStartTime
             print(SpinsInShower, SpinsInShower * 2.25 * 0.000594389, time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(ShowerStartTime)), int(math.ceil(ShowerTime)))
+#            logf.write("{0} {1} {2} {3} {4}\n".format(SpinsInShower, SpinsInShower * 2.25 * 0.000594389, time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(ShowerStartTime)), int(math.ceil(ShowerTime))))
             post_amount(SpinsInShower * 2.25 * 0.000594389, time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.localtime(ShowerStartTime)), int(math.ceil(ShowerTime)))
 
         count = count + 1   
         if(time.time() >= StartTime + 10):
-            print(count, spins)
+            print(count, spins, flush=True)
+            logf.write("{0} {1}\n".format(count, spins)) 
             StartTime = time.time()
             count = 0
 
 def post_amount(amt, timestamp, duration_in_seconds):
     amount = {"amount":amt,"timestamp":timestamp, "duration_in_seconds":duration_in_seconds}
-    resp = requests.post("http://localhost:5000/flow_sensor/api/v1.0/amounts", json=amount)
+    resp = requests.post("https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amounts", json=amount)
     if resp.status_code != 201:
         raise ApiError('POST /amounts/ {}'.format(resp.status_code))
     print('Created amounts. ID: {}'.format(resp.json())) 
