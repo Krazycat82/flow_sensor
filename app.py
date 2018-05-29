@@ -39,7 +39,7 @@ firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 
 class WaterUsage:
-    def __init__(self, amount, duration_in_seconds, timestamp, household):
+    def __init__(self, amount, duration_in_seconds, timestamp, household, number_of_sessions):
         self.timestamp = timestamp.strftime("%D %T")
         self.date = timestamp.strftime("%Y%m%d")
         self.week = timestamp.strftime("%Y%V")
@@ -48,6 +48,12 @@ class WaterUsage:
         self.amount = amount
         self.duration_in_seconds = duration_in_seconds
         self.household = household
+        self.number_of_sessions = number_of_sessions
+
+class WaterUsageSummary:
+    def __init__(self, amount, number_of_sessions):
+        self.amount = amount
+        self.number_of_sessions = number_of_sessions
 
 def time2str(t):
     return t.strftime("%d %b %Y %H:%M:%S")
@@ -55,7 +61,7 @@ def time2str(t):
 #flow_sensor/raw_amounts
 def save_raw_amounts(amount, duration_in_seconds, timestamp, household):
     print "++++ save_raw_amounts: amount=" + str(amount) + " duration=" + str(duration_in_seconds) + " timestamp=" + time2str(timestamp)
-    water_usage = WaterUsage(amount, duration_in_seconds, timestamp, household)
+    water_usage = WaterUsage(amount, duration_in_seconds, timestamp, household, 1)
     db.child(household).child("flow_sensor_1").child("raw_amounts").push(water_usage.__dict__)
     return water_usage
 
@@ -96,6 +102,8 @@ def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amt, duration_i
     new_duration = duration_in_seconds
     prev_amount = 0
     prev_duration = 0
+    prev_sessions = 0
+    new_sessions = 1 # always default to 1
     # only loops thru if daily amounts isn't empty
     if len(amounts.each()) > 0:
         for amount in amounts.each():
@@ -104,12 +112,16 @@ def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amt, duration_i
             print json_data
             prev_amount = python_obj["amount"]
             prev_duration = python_obj["duration_in_seconds"]
+            prev_sessions = python_obj["number_of_sessions"]
             new_amount = new_amount + prev_amount
             new_duration = new_duration + prev_duration
-            print "new_amount = " + str(new_amount)
-            print "new_duration = " + str(new_duration)
-    water_usage = WaterUsage(new_amount, new_duration, timestamp, household)
+            new_sessions = new_sessions + prev_sessions
+            # print "new_amount = " + str(new_amount)
+            # print "new_duration = " + str(new_duration)
+            # print "new_sessions = " + str(new_sessions)
+    water_usage = WaterUsage(new_amount, new_duration, timestamp, household, new_sessions)
     print "*** prev_amount=" + str(prev_amount) + " prev_duration= " + str(prev_duration) + "*** amount=" + str(amt) + " duration= " + str(duration_in_seconds)
+    print "*** prev_sessions=" + str(prev_sessions) + "*** new sessions=" + str(new_sessions)
     print "*** New WaterUsage: " + json.dumps(water_usage.__dict__)
     db.child(household).child("flow_sensor_1").child(aggregate_type).child(aggregate_key).set(water_usage.__dict__)
 
