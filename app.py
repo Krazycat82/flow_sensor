@@ -127,6 +127,10 @@ def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amt, duration_i
     print "*** prev_sessions=" + str(prev_sessions) + "*** new sessions=" + str(new_sessions)
     print "*** New WaterUsage: " + json.dumps(water_usage.__dict__)
     db.child(household).child("flow_sensor_1").child(aggregate_type).child(aggregate_key).set(water_usage.__dict__)
+    # TODO: hack solution for now
+    if aggregate_type == "yearly_amounts":
+        water_usage_summary = WaterUsageSummary(new_amount, new_sessions)
+        db.child(household).child("profile").child("total_amount").update(water_usage_summary.__dict__)
 
 def get_usage_amounts(amounts_type, household):
     print "++++ " + household + ": " + amounts_type + ": "
