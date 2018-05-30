@@ -112,7 +112,10 @@ def aggregate_usage(aggregate_type, aggregate_by, aggregate_key, amt, duration_i
             print json_data
             prev_amount = python_obj["amount"]
             prev_duration = python_obj["duration_in_seconds"]
-            prev_sessions = python_obj["number_of_sessions"]
+            if 'number_of_sessions' in python_obj:
+                prev_sessions = python_obj["number_of_sessions"]
+            else:
+                prev_sessions = 1 # assume there is at least 1
             new_amount = new_amount + prev_amount
             new_duration = new_duration + prev_duration
             new_sessions = new_sessions + prev_sessions
