@@ -16,6 +16,8 @@ import datetime, time
 import json
 import random
 
+demo_family = "Family_Demo"
+
 # https://thedots-19a0e.firebaseio.com/flow_sensor
 
 # my account
@@ -146,12 +148,15 @@ def get_usage_amounts(amounts_type, household):
     return json_data
 
 def process(amount, duration_in_seconds, timestamp, household):
+
     water_usage = save_raw_amounts(amount, duration_in_seconds, timestamp, household)
-    update_today_amount(amount, duration_in_seconds, timestamp, household)
-    update_daily_amount(amount, duration_in_seconds, timestamp, household)
-    update_weekly_amount(amount, duration_in_seconds, timestamp, household)
-    update_monthly_amount(amount, duration_in_seconds, timestamp, household)
-    update_yearly_amount(amount, duration_in_seconds, timestamp, household)
+    # only aggregate if duration > 10s or we are demo'ing household name = demo family name
+    if (duration_in_seconds > 10 or household == demo_family):
+        update_today_amount(amount, duration_in_seconds, timestamp, household)
+        update_daily_amount(amount, duration_in_seconds, timestamp, household)
+        update_weekly_amount(amount, duration_in_seconds, timestamp, household)
+        update_monthly_amount(amount, duration_in_seconds, timestamp, household)
+        update_yearly_amount(amount, duration_in_seconds, timestamp, household)
     return water_usage
 
 ### Simulation days of data
