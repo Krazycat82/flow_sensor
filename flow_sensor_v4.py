@@ -1,6 +1,6 @@
 #Reads ~ 6793 times per sec
 # I learned how to count potatoes and I also learned how to make the code run faster
-# Printing takes time 
+# Printing takes time
 #
 import RPi.GPIO as GPIO
 import time
@@ -11,11 +11,19 @@ import json
 FlowPin = 8  # flow sensor pin
 LastState = 0 #last state
 #logf = open("/home/pi/flow_sensor/flow_sensor.log", "w+", 1)
+household = "Family_B"
+
+def time2str(t):
+    return time.strftime("%d %b %Y %H:%M:%S", time.localtime(t))
+
+def log(message):
+    logtime = time.strftime("%D %T", time.localtime(time.time()))
+    print logtime + " " + message
 
 def setup():
     GPIO.setmode(GPIO.BOARD)  #Numbers GPIOS by Physical Location
     GPIO.setup(FlowPin, GPIO.IN) #Set FlowPin's Mode to Input
-    print("Starting....")
+    log("Starting....")
 #    logf.write("Starting....\n")
  
 def time2str(t):
@@ -77,7 +85,7 @@ def read():
             count = 0
 
 def post_amount(amt, timestamp, duration_in_seconds):
-    amount = {"amount":amt,"timestamp":timestamp, "duration_in_seconds":duration_in_seconds}
+    amount = {"amount":amt,"timestamp":timestamp, "duration_in_seconds":duration_in_seconds, "household": household}
     log("**** post_amount: " + json.dumps(amount))
     resp = requests.post("https://dots-dripdrop-api.herokuapp.com/flow_sensor/api/v1.0/amounts", json=amount)
     if resp.status_code != 201:
