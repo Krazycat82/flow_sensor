@@ -160,7 +160,8 @@ def is_valid_data(household, amount, duration_in_seconds):
         if duration_in_seconds > 10:
             if (amount/(duration_in_seconds/60.0) > 1.0):
                 is_valid = True
-                # print amount/(duration_in_seconds/60.0), is_valid
+    
+    print "++++ is_valid_data:", household, amount, (duration_in_seconds/60.0), is_valid
     
     return is_valid
 
