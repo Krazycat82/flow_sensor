@@ -147,11 +147,29 @@ def get_usage_amounts(amounts_type, household):
         # TODO return all the amounts not just the last one
     return json_data
 
+#
+# rules:
+# amount/min > 1.0 G/M
+# duration in seconds > 10
+def is_valid_data(household, amount, duration_in_seconds):
+    is_valid = False
+
+    if (household == demo_family):
+        is_valid = True
+    else:
+        if duration_in_seconds > 10:
+            if (amount/(duration_in_seconds/60.0) > 1.0):
+                is_valid = True
+                # print amount/(duration_in_seconds/60.0), is_valid
+    
+    return is_valid
+
 def process(amount, duration_in_seconds, timestamp, household):
 
     water_usage = save_raw_amounts(amount, duration_in_seconds, timestamp, household)
     # only aggregate if duration > 10s or we are demo'ing household name = demo family name
-    if (duration_in_seconds > 10 or household == demo_family):
+    is_valid = is_valid_data(household, amount, duration_in_seconds)
+    if (is_valid):
         update_today_amount(amount, duration_in_seconds, timestamp, household)
         update_daily_amount(amount, duration_in_seconds, timestamp, household)
         update_weekly_amount(amount, duration_in_seconds, timestamp, household)
